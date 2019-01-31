@@ -3,16 +3,21 @@ package com.fedak.denis.mymvvm.viewmodel
 import android.app.Application
 import android.arch.lifecycle.MutableLiveData
 import android.content.Context
+import android.support.v7.util.DiffUtil
 import android.util.Log
 import android.view.View
 import com.fedak.denis.mymvvm.activity.MainActivity.Companion.LOG
 import com.fedak.denis.mymvvm.adapter.CarAdapter
+import com.fedak.denis.mymvvm.adapter.CarDiffUtilCallback
 import com.fedak.denis.mymvvm.model.Car
 import com.fedak.denis.mymvvm.repository.CarRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
+import android.view.MenuInflater
+
+
 
 class MainViewModel @Inject constructor(context: Context) : BaseViewModel(context as Application) {
 
@@ -62,7 +67,10 @@ class MainViewModel @Inject constructor(context: Context) : BaseViewModel(contex
     }
 
     fun refreshAdapter(cars: List<Car>) {
-        carAdapter.setData(cars)
+        val diffUtilCallback = CarDiffUtilCallback(carAdapter.cars, cars)
+        val diffResult = DiffUtil.calculateDiff(diffUtilCallback)
+        carAdapter.cars = cars
+        diffResult.dispatchUpdatesTo(carAdapter)
     }
 
     fun setSuscriptions(subscriptions: CompositeDisposable) {
